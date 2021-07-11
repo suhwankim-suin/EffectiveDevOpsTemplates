@@ -1,4 +1,7 @@
 """Generating CloudFormation template."""
+
+from requests import get
+
 from troposphere  import (
 	Base64,
 	ec2,
@@ -11,6 +14,10 @@ from troposphere  import (
 )
 
 ApplicationPort = "3000"
+PublicCidrIp = Join("",[
+                  get("https://api.ipify.org").text,
+                  "/32",
+                ])
 
 t = Template()
 
@@ -30,7 +37,7 @@ t.add_resource(ec2.SecurityGroup(
 			IpProtocol="tcp",
 			FromPort="22",
 			ToPort="22",
-			CidrIp="0.0.0.0/0"
+			CidrIp=PublicCidrIp
 		),
         ec2.SecurityGroupRule (
 			IpProtocol="tcp",
